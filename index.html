@@ -22,7 +22,7 @@
         /* Login */
         #login-page { height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at top right, #cbd5e1, #f1f5f9); }
         .login-card { background: var(--surface); padding: 60px 40px; border-radius: 32px; box-shadow: var(--shadow-bold); width: 100%; max-width: 380px; text-align: center; }
-        .login-card img { width: 120px; margin-bottom: 20px; }
+        .login-card img { width: 120px; margin-bottom: 10px; }
         .input-box { width: 100%; padding: 16px; margin: 12px 0; border: 1.5px solid var(--border); border-radius: 14px; box-sizing: border-box; outline: none; font-family: inherit; }
         .btn-action { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; }
         
@@ -50,7 +50,8 @@
     <div id="login-page">
         <div class="login-card">
             <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png">
-            <h1 style="margin: 10px 0; font-size: 22px; font-weight: 800;">ABASTECIMENTO</h1>
+            <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #0f172a;">ABASTECIMENTO</h1>
+            <p style="margin: 5px 0 30px 0; font-size: 12px; color: #64748b; letter-spacing: 2px; font-weight: 600;">SISTEMA DE INSUMOS</p>
             <input type="text" id="user" class="input-box" placeholder="Usuário">
             <input type="password" id="pass" class="input-box" placeholder="Senha">
             <button class="btn-action" onclick="fazerLogin()">ENTRAR</button>
@@ -103,15 +104,15 @@
                 </div>
                 <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
                     <div class="dash-card">
-                        <h4 style="margin-top:0">Volume Total por Insumo</h4>
+                        <h4 style="margin-top:0">Volume por Insumo (Barras)</h4>
                         <canvas id="chartPrincipal"></canvas>
                     </div>
                     <div class="dash-card">
-                        <h4 style="margin-top:0">Status de Preenchimento</h4>
+                        <h4 style="margin-top:0">Distribuição de Materiais</h4>
                         <canvas id="chartDonut"></canvas>
                     </div>
                     <div class="dash-card" style="grid-column: span 2;">
-                        <h4 style="margin-top:0">Volume de Itens por Localidade</h4>
+                        <h4 style="margin-top:0">Volume Total por Unidade</h4>
                         <canvas id="chartTimeline"></canvas>
                     </div>
                 </div>
@@ -127,11 +128,10 @@
         </div>
     </div>
 
-    <div id="pdf-container" style="display:none; padding: 40px;"></div>
+    <div id="pdf-container" style="display:none; padding: 40px; background: white;"></div>
     <a href="https://wa.me/554896712560" class="btn-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
 
     <script>
-        // --- CONFIGURAÇÃO FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyCkl0Q5qofLsc3ujPvJYAiHzIxEZj4d780",
             authDomain: "sistema-ccb.firebaseapp.com",
@@ -166,7 +166,6 @@
             database.ref('abastecimento/' + mesAtivo).on('value', (snapshot) => {
                 bancoDadosMensal[mesAtivo] = snapshot.val() || {};
                 renderizarGrid();
-                // Se o dashboard estiver aberto, atualiza os gráficos em tempo real
                 if(!document.getElementById('view-dash').classList.contains('hidden')) atualizarGraficos();
             });
         }
@@ -242,61 +241,80 @@
             listaInsumos.forEach(i => totaisInsumos[i] = 0);
             listaLocais.forEach(l => volumePorLocal[l] = 0);
 
-            let locaisAtivosCont = 0;
             for(let l in dadosMes) {
-                locaisAtivosCont++;
                 for(let i in dadosMes[l]) {
                     totaisInsumos[i] += (dadosMes[l][i].q || 0);
                     volumePorLocal[l] += (dadosMes[l][i].q || 0);
                 }
             }
 
-            // 1. Gráfico de Barras (Principal)
+            const activeInsumos = listaInsumos.filter(i => totaisInsumos[i] > 0);
+            const cores = ['#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'];
+
+            // 1. Barras
             if(window.ch1) window.ch1.destroy();
-            const labelsBar = listaInsumos.filter(i => totaisInsumos[i] > 0);
             window.ch1 = new Chart(document.getElementById('chartPrincipal'), {
                 type: 'bar', 
-                data: { labels: labelsBar, datasets: [{ label: 'Qtd Total', data: labelsBar.map(i => totaisInsumos[i]), backgroundColor: '#0f172a', borderRadius: 8 }] },
+                data: { labels: activeInsumos, datasets: [{ data: activeInsumos.map(i => totaisInsumos[i]), backgroundColor: '#0f172a', borderRadius: 8 }] },
                 options: { indexAxis: 'y', plugins: { legend: { display: false } } }
             });
 
-            // 2. Gráfico de Rosca (Status)
+            // 2. Rosca (Por Material)
             if(window.ch2) window.ch2.destroy();
             window.ch2 = new Chart(document.getElementById('chartDonut'), {
                 type: 'doughnut',
                 data: { 
-                    labels: ['Atendidos', 'Pendentes'], 
-                    datasets: [{ data: [locaisAtivosCont, listaLocais.length - locaisAtivosCont], backgroundColor: ['#0f172a', '#e2e8f0'], borderWidth: 0 }] 
+                    labels: activeInsumos, 
+                    datasets: [{ data: activeInsumos.map(i => totaisInsumos[i]), backgroundColor: cores, borderWidth: 2 }] 
                 },
-                options: { cutout: '70%' }
+                options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
             });
 
-            // 3. Gráfico de Linha (Timeline/Volume)
+            // 3. Linha (Por Unidade)
             if(window.ch3) window.ch3.destroy();
             const labelsLocais = listaLocais.filter(l => volumePorLocal[l] > 0);
             window.ch3 = new Chart(document.getElementById('chartTimeline'), {
                 type: 'line',
                 data: { 
                     labels: labelsLocais, 
-                    datasets: [{ label: 'Volume de Itens', data: labelsLocais.map(l => volumePorLocal[l]), borderColor: '#0f172a', backgroundColor: 'rgba(15, 23, 42, 0.1)', fill: true, tension: 0.4 }] 
+                    datasets: [{ label: 'Volume Total', data: labelsLocais.map(l => volumePorLocal[l]), borderColor: '#0f172a', backgroundColor: 'rgba(15, 23, 42, 0.1)', fill: true, tension: 0.4 }] 
                 }
             });
         }
 
-        // PDF Functions (Mantidas conforme solicitado)
         function gerarPDF() {
             const mesAtivo = document.getElementById('input-mes-ref').value;
             const dadosMes = bancoDadosMensal[mesAtivo] || {};
-            let html = `<div style="text-align:center"><img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" width="80"><h1>GERAL: ${mesAtivo}</h1></div>`;
+            let html = `<div style="text-align:center; font-family: sans-serif;">
+                <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" width="70">
+                <h2 style="margin:10px 0 0 0;">CONGREGAÇÃO CRISTÃ NO BRASIL</h2>
+                <h3 style="margin:5px 0 20px 0; color:#475569;">Relatório Geral de Insumos - ${mesAtivo}</h3>
+            </div>`;
+            
             listaInsumos.forEach(item => {
-                let itemTotal = 0; let table = `<table border="1" style="width:100%; border-collapse:collapse; margin-bottom:20px;"><tr><th>Unidade</th><th>Qtd</th><th>Obs</th></tr>`;
+                let itemTotal = 0; 
+                let table = `<table border="1" style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:12px;">
+                    <tr style="background:#f8fafc;">
+                        <th style="padding:8px; text-align:left;">Unidade</th>
+                        <th style="padding:8px; width:80px;">Qtd</th>
+                        <th style="padding:8px; text-align:left;">Observação</th>
+                    </tr>`;
                 let has = false;
-                for(let loc in dadosMes) { if(dadosMes[loc][item]) { table += `<tr><td>${loc}</td><td align="center">${dadosMes[loc][item].q}</td><td>${dadosMes[loc][item].o}</td></tr>`; itemTotal += dadosMes[loc][item].q; has = true; } }
-                if(has) html += `<h3>${item} (Total: ${itemTotal})</h3>` + table + `</table>`;
+                for(let loc in dadosMes) { 
+                    if(dadosMes[loc][item]) { 
+                        table += `<tr>
+                            <td style="padding:8px;">${loc}</td>
+                            <td style="padding:8px;" align="center">${dadosMes[loc][item].q}</td>
+                            <td style="padding:8px;">${dadosMes[loc][item].o}</td>
+                        </tr>`; 
+                        itemTotal += dadosMes[loc][item].q; has = true; 
+                    } 
+                }
+                if(has) html += `<div style="background:#0f172a; color:white; padding:5px 12px; font-weight:bold; margin-top:20px;">${item.toUpperCase()} (TOTAL: ${itemTotal})</div>` + table + `</table>`;
             });
             const container = document.getElementById('pdf-container');
             container.innerHTML = html; container.style.display = 'block';
-            html2pdf().from(container).set({ margin: 1, filename: `Geral_${mesAtivo}.pdf` }).save().then(() => container.style.display='none');
+            html2pdf().from(container).set({ margin: 10, filename: `Geral_${mesAtivo}.pdf`, image: { type: 'jpeg', quality: 0.98 } }).save().then(() => container.style.display='none');
         }
 
         function gerarPDFEntrega() {
@@ -304,13 +322,49 @@
             const mes = document.getElementById('input-mes-ref').value;
             if(!local) return;
             const dados = bancoDadosMensal[mes]?.[local] || {};
-            let html = `<div style="text-align:center; border-bottom:2px solid #000; padding-bottom:20px;"><img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" width="80"><h1>RELATÓRIO DE ENTREGA</h1><h2>${local}</h2><p>MÊS: ${mes}</p></div><table border="1" style="width:100%; border-collapse:collapse; margin-top:30px;"><tr style="background:#eee;"><th>ITEM</th><th>QTD</th><th>OBS</th></tr>`;
+            let html = `
+                <div style="font-family: sans-serif; border: 2px solid #0f172a; padding: 30px; border-radius: 10px;">
+                    <div style="text-align:center; border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 30px;">
+                        <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" width="80">
+                        <h1 style="margin:15px 0 5px 0; font-size:22px;">CONGREGAÇÃO CRISTÃ NO BRASIL</h1>
+                        <h2 style="margin:0; font-size:18px; color: #475569;">RELATÓRIO DE ENTREGA DE INSUMOS</h2>
+                    </div>
+                    
+                    <div style="margin-bottom: 30px; display: flex; justify-content: space-between;">
+                        <span><strong>UNIDADE:</strong> ${local.toUpperCase()}</span>
+                        <span><strong>MÊS:</strong> ${mes}</span>
+                    </div>
+
+                    <table border="1" style="width:100%; border-collapse:collapse; margin-bottom: 40px;">
+                        <tr style="background:#0f172a; color:white;">
+                            <th style="padding:12px; text-align:left;">DESCRIÇÃO DO ITEM</th>
+                            <th style="padding:12px; width:100px;">QUANT.</th>
+                            <th style="padding:12px; text-align:left;">OBSERVAÇÃO</th>
+                        </tr>`;
+            
             let count = 0;
-            listaInsumos.forEach(item => { if(dados[item]) { html += `<tr><td style="padding:10px;">${item}</td><td align="center"><b>${dados[item].q}</b></td><td>${dados[item].o}</td></tr>`; count++; } });
-            html += `</table>`;
+            listaInsumos.forEach(item => { 
+                if(dados[item]) { 
+                    html += `<tr>
+                        <td style="padding:12px;">${item}</td>
+                        <td style="padding:12px;" align="center"><strong>${dados[item].q}</strong></td>
+                        <td style="padding:12px; font-size:11px;">${dados[item].o}</td>
+                    </tr>`; 
+                    count++; 
+                } 
+            });
+
+            html += `</table>
+                    <div style="margin-top:80px; display:flex; justify-content: space-around; text-align:center;">
+                        <div style="width:250px; border-top: 1px solid #000; padding-top:10px;">Assinatura Responsável</div>
+                        <div style="width:250px; border-top: 1px solid #000; padding-top:10px;">Data da Entrega</div>
+                    </div>
+                </div>`;
+
             const container = document.getElementById('pdf-container');
-            container.innerHTML = count > 0 ? html : "<h3>Vazio</h3>"; container.style.display = 'block';
-            html2pdf().from(container).set({ margin: 1, filename: `Entrega_${local}_${mes}.pdf` }).save().then(() => container.style.display='none');
+            container.innerHTML = count > 0 ? html : "<h3 style='text-align:center'>Nenhum dado registrado para esta unidade.</h3>";
+            container.style.display = 'block';
+            html2pdf().from(container).set({ margin: 15, filename: `Entrega_${local}_${mes}.pdf` }).save().then(() => container.style.display='none');
         }
     </script>
 </body>
