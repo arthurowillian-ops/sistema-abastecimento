@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Abastecimento - Regional Tubarão</title>
     
-    <!-- SDK Firebase Compat -->
+    <!-- SDK Firebase Compat (Necessário para o código atual) -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     
@@ -97,6 +97,7 @@
                 <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
                     <div class="dash-card"><canvas id="chartPrincipal"></canvas></div>
                     <div class="dash-card"><canvas id="chartDonut"></canvas></div>
+                    <div class="dash-card" style="grid-column: span 2;"><canvas id="chartTimeline"></canvas></div>
                 </div>
             </div>
 
@@ -134,10 +135,7 @@
         let localAtivo = "";
 
         function fazerLogin() {
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
-            // Usando suas credenciais solicitadas anteriormente
-            if(u === 'arthurowillian' && p === 'admin1') {
+            if(document.getElementById('user').value === 'arthurowillian' && document.getElementById('pass').value === 'admin1') {
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('app').classList.remove('hidden');
                 document.getElementById('input-mes-ref').value = new Date().toISOString().slice(0, 7);
@@ -234,12 +232,6 @@
                 type: 'bar', data: { labels: labelsBar, datasets: [{ data: labelsBar.map(i => totais[i]), backgroundColor: '#0f172a' }] },
                 options: { indexAxis: 'y', plugins: { legend: { display: false } } }
             });
-
-            if(window.ch2) window.ch2.destroy();
-            window.ch2 = new Chart(document.getElementById('chartDonut'), {
-                type: 'doughnut',
-                data: { labels: ['Preenchidos', 'Restantes'], datasets: [{ data: [Object.keys(dadosMes).length, listaLocais.length - Object.keys(dadosMes).length], backgroundColor: ['#0f172a', '#e2e8f0'] }] }
-            });
         }
 
         function gerarPDF() {
@@ -265,7 +257,7 @@
             let html = `<div style="text-align:center; border-bottom:2px solid #000; padding-bottom:20px;"><img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" width="80"><h1>RELATÓRIO DE ENTREGA</h1><h2>${local}</h2><p>MÊS: ${mes}</p></div><table border="1" style="width:100%; border-collapse:collapse; margin-top:30px;"><tr style="background:#eee;"><th>ITEM</th><th>QTD</th><th>OBS</th></tr>`;
             let count = 0;
             listaInsumos.forEach(item => { if(dados[item]) { html += `<tr><td style="padding:10px;">${item}</td><td align="center"><b>${dados[item].q}</b></td><td>${dados[item].o}</td></tr>`; count++; } });
-            html += `</table><div style="margin-top:50px; text-align:right;"><p>___________________________</p><p>Assinatura</p></div>`;
+            html += `</table>`;
             const container = document.getElementById('pdf-container');
             container.innerHTML = count > 0 ? html : "<h3>Vazio</h3>"; container.style.display = 'block';
             html2pdf().from(container).set({ margin: 1, filename: `Entrega_${local}_${mes}.pdf` }).save().then(() => container.style.display='none');
