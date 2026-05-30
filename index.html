@@ -15,41 +15,89 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        :root { --bg-body: #f1f5f9; --surface: #ffffff; --primary: #0f172a; --secondary: #475569; --border: #e2e8f0; --shadow-bold: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        :root { 
+            --bg-body: #f1f5f9; 
+            --surface: #ffffff; 
+            --primary: #0f172a; 
+            --secondary: #475569; 
+            --border: #e2e8f0; 
+            --shadow-bold: 0 20px 25px -5px rgba(0, 0, 0, 0.1); 
+        }
+        
+        * { box-sizing: border-box; }
+        
         body { background-color: var(--bg-body); color: var(--primary); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
         .hidden { display: none !important; }
         
         /* Login */
-        #login-page { height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at top right, #cbd5e1, #f1f5f9); }
-        .login-card { background: var(--surface); padding: 60px 40px; border-radius: 32px; box-shadow: var(--shadow-bold); width: 100%; max-width: 380px; text-align: center; }
-        .login-card img { width: 120px; margin-bottom: 10px; }
-        .input-box { width: 100%; padding: 16px; margin: 12px 0; border: 1.5px solid var(--border); border-radius: 14px; box-sizing: border-box; outline: none; font-family: inherit; }
-        .btn-action { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        #login-page { min-height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at top right, #cbd5e1, #f1f5f9); padding: 20px; }
+        .login-card { background: var(--surface); padding: 40px 30px; border-radius: 32px; box-shadow: var(--shadow-bold); width: 100%; max-width: 380px; text-align: center; }
+        .login-card img { width: 100px; margin-bottom: 10px; }
+        .input-box { width: 100%; padding: 14px; margin: 8px 0; border: 1.5px solid var(--border); border-radius: 14px; box-sizing: border-box; outline: none; font-family: inherit; font-size: 15px; }
+        .btn-action { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 15px; }
+        .btn-action:hover { opacity: 0.9; }
         
-        /* Header */
-        header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); padding: 15px 60px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .brand-box { display: flex; align-items: center; gap: 20px; }
-        .brand-box img { height: 65px; }
-        .nav-links { display: flex; align-items: center; }
-        .nav-links button { background: none; border: none; padding: 12px 24px; color: var(--secondary); cursor: pointer; font-weight: 700; border-radius: 12px; transition: 0.3s; }
-        .nav-links button.active { color: var(--primary); background: #f8fafc; }
+        /* Header Responsivo */
+        header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); padding: 15px 30px; display: flex; flex-direction: column; gap: 15px; position: sticky; top: 0; z-index: 100; }
+        .brand-box { display: flex; align-items: center; gap: 15px; }
+        .brand-box img { height: 50px; }
+        .brand-box h1 { font-size: 16px; margin: 0; font-weight: 800; }
+        
+        .nav-links { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+        .nav-links button { background: none; border: none; padding: 10px 16px; color: var(--secondary); cursor: pointer; font-weight: 700; border-radius: 12px; transition: 0.3s; font-size: 13px; flex: 1; min-width: 120px; text-align: center; background-color: #f8fafc; }
+        .nav-links button.active { color: var(--surface); background: var(--primary); }
         
         /* Container & Cards */
-        .container { max-width: 1300px; margin: 50px auto; padding: 0 30px; }
-        .grid-locais { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; }
-        .card-local { background: var(--surface); padding: 45px 25px; border-radius: 28px; text-align: center; border: 1px solid var(--border); transition: all 0.4s ease; cursor: pointer; position: relative; }
-        .card-local:hover { border-color: var(--primary); transform: translateY(-8px); box-shadow: var(--shadow-bold); }
-        .card-local .icon-img { width: 120px; height: 120px; object-fit: contain; margin-bottom: 25px; }
-        .status-badge { position: absolute; top: 20px; right: 20px; color: #10b981; font-size: 1.6rem; }
-        .dash-card, .form-card { background: var(--surface); padding: 35px; border-radius: 28px; border: 1px solid var(--border); margin-bottom: 30px; }
-        .btn-whatsapp { position: fixed; bottom: 40px; right: 40px; background: #25d366; color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 15px 30px rgba(37, 211, 102, 0.4); text-decoration: none; font-size: 2rem; }
+        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
+        .grid-locais { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .card-local { background: var(--surface); padding: 30px 15px; border-radius: 24px; text-align: center; border: 1px solid var(--border); transition: all 0.3s ease; cursor: pointer; position: relative; }
+        .card-local:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: var(--shadow-bold); }
+        .card-local .icon-img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 15px; }
+        .status-badge { position: absolute; top: 15px; right: 15px; color: #10b981; font-size: 1.3rem; }
+        
+        .dash-card, .form-card { background: var(--surface); padding: 25px; border-radius: 24px; border: 1px solid var(--border); margin-bottom: 25px; }
+        
+        /* Linha de insumo no formulário adaptável */
+        .insumo-row { display: grid; grid-template-columns: 1fr; gap: 10px; padding: 15px 0; border-bottom: 1px solid #f1f5f9; align-items: center; }
+        .insumo-title { font-weight: 700; font-size: 15px; }
+        .insumo-inputs { display: grid; grid-template-columns: 80px 1fr; gap: 10px; }
+        
+        /* Layout de Gráficos Adaptável */
+        .charts-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
+        
+        /* Botão Whatsapp */
+        .btn-whatsapp { position: fixed; bottom: 20px; right: 20px; background: #25d366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3); text-decoration: none; font-size: 1.6rem; z-index: 999; }
+
+        /* Ajustes para telas maiores (Computadores) */
+        @media (min-width: 768px) {
+            header { flex-direction: row; justify-content: space-between; align-items: center; padding: 15px 60px; }
+            .nav-links { width: auto; }
+            .nav-links button { flex: none; background: none; font-size: 14px; }
+            .nav-links button.active { color: var(--primary); background: #f8fafc; }
+            .brand-box h1 { font-size: 18px; }
+            .container { margin: 50px auto; padding: 0 30px; }
+            .grid-locais { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 30px; }
+            .card-local { padding: 45px 25px; }
+            .card-local .icon-img { width: 110px; height: 110px; }
+            .insumo-row { grid-template-columns: 2fr 1fr 3fr; gap: 20px; padding: 12px 0; }
+            .insumo-inputs { display: contents; }
+            .charts-grid { grid-template-columns: 1.5fr 1fr; }
+            .chart-span-2 { grid-column: span 2; }
+            .btn-whatsapp { bottom: 40px; right: 40px; width: 65px; height: 65px; font-size: 2rem; }
+        }
+        
+        /* CSS utilitário para alinhar topo do formulário */
+        .form-header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+        @media (min-width: 500px) {
+            .form-header { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
     </style>
 </head>
 <body>
 
     <div id="login-page">
         <div class="login-card">
-            <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png">
+            <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" alt="Logo">
             <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #0f172a;">ABASTECIMENTO</h1>
             <p style="margin: 5px 0 30px 0; font-size: 12px; color: #64748b; letter-spacing: 2px; font-weight: 600;">SISTEMA DE INSUMOS</p>
             <input type="text" id="user" class="input-box" placeholder="Usuário">
@@ -61,48 +109,48 @@
     <div id="app" class="hidden">
         <header>
             <div class="brand-box">
-                <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png">
+                <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" alt="Logo">
                 <div>
-                    <h1 style="font-size: 18px; margin: 0; font-weight: 800;">SISTEMA DE ABASTECIMENTO DE INSUMOS</h1>
+                    <h1>SISTEMA DE ABASTECIMENTO</h1>
                     <small style="color: var(--secondary); font-weight: 600;">Regional Tubarão/SC</small>
                 </div>
             </div>
             <nav class="nav-links">
                 <button onclick="mudarTab('home')" id="nav-home" class="active">LOCALIDADES</button>
                 <button onclick="mudarTab('dash')" id="nav-dash">DASHBOARD</button>
-                <button onclick="mudarTab('entrega')" id="nav-entrega">RELATÓRIO DE ENTREGA</button>
-                <button onclick="location.reload()" style="color: #ef4444; margin-left: 10px;"><i class="fas fa-power-off"></i> SAIR</button>
+                <button onclick="mudarTab('entrega')" id="nav-entrega">RELATÓRIOS</button>
+                <button onclick="location.reload()" style="color: #ef4444; background: #fee2e2;"><i class="fas fa-power-off"></i> SAIR</button>
             </nav>
         </header>
 
         <div class="container">
             <div id="view-home">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-                    <h2 style="font-weight: 800; font-size: 28px; margin: 0;">Rede de Distribuição</h2>
-                    <input type="month" id="input-mes-ref" class="input-box" style="width: auto;" onchange="sincronizarComFirebase()">
+                <div class="form-header">
+                    <h2 style="font-weight: 800; font-size: 26px; margin: 0;">Rede de Distribuição</h2>
+                    <input type="month" id="input-mes-ref" class="input-box" style="width: 100%; max-width: 200px; margin: 0;" onchange="sincronizarComFirebase()">
                 </div>
                 <div class="grid-locais" id="grid-unidades"></div>
             </div>
 
             <div id="view-form" class="hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                    <h2 id="title-local-form" style="font-weight: 800;"></h2>
-                    <button onclick="mudarTab('home')" class="nav-links">VOLTAR</button>
+                <div class="form-header">
+                    <h2 id="title-local-form" style="font-weight: 800; margin: 0; font-size: 22px;"></h2>
+                    <button onclick="mudarTab('home')" class="btn-action" style="width: auto; padding: 10px 20px; background: #64748b;">VOLTAR</button>
                 </div>
                 <div class="form-card">
                     <div id="lista-insumos-inputs"></div>
-                    <button class="btn-action" style="margin-top: 40px;" onclick="salvarDadosUnidade()">SALVAR REGISTROS</button>
+                    <button class="btn-action" style="margin-top: 30px;" onclick="salvarDadosUnidade()">SALVAR REGISTROS</button>
                 </div>
             </div>
 
             <div id="view-dash" class="hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-                    <h2 style="font-weight: 800; font-size: 28px;">Análise Geral</h2>
-                    <button class="btn-action" style="width: auto; padding: 12px 30px;" onclick="gerarPDF()">
-                        <i class="fas fa-download"></i> BAIXAR RELATÓRIO GERAL
+                <div class="form-header">
+                    <h2 style="font-weight: 800; font-size: 26px; margin: 0;">Análise Geral</h2>
+                    <button class="btn-action" style="width: auto; padding: 12px 25px;" onclick="gerarPDF()">
+                        <i class="fas fa-download"></i> RELATÓRIO GERAL
                     </button>
                 </div>
-                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px;">
+                <div class="charts-grid">
                     <div class="dash-card">
                         <h4 style="margin-top:0">Volume por Insumo (Barras)</h4>
                         <canvas id="chartPrincipal"></canvas>
@@ -111,7 +159,7 @@
                         <h4 style="margin-top:0">Distribuição de Materiais</h4>
                         <canvas id="chartDonut"></canvas>
                     </div>
-                    <div class="dash-card" style="grid-column: span 2;">
+                    <div class="dash-card chart-span-2">
                         <h4 style="margin-top:0">Volume Total por Unidade</h4>
                         <canvas id="chartTimeline"></canvas>
                     </div>
@@ -119,15 +167,17 @@
             </div>
 
             <div id="view-entrega" class="hidden">
-                <h2 style="font-weight: 800; font-size: 28px; margin-bottom: 40px;">Relatório de Entrega Individual</h2>
+                <h2 style="font-weight: 800; font-size: 26px; margin-bottom: 30px;">Relatório de Entrega</h2>
                 <div class="form-card">
+                    <label style="font-weight: 700; display: block; margin-bottom: 8px;">Selecione a Unidade:</label>
                     <select id="select-entrega-local" class="input-box"></select>
-                    <button class="btn-action" style="margin-top: 20px;" onclick="gerarPDFEntrega()">GERAR RELATÓRIO DE ENTREGA</button>
+                    <button class="btn-action" style="margin-top: 20px;" onclick="gerarPDFEntrega()">GERAR RELATÓRIO</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Container temporário oculto para renderização dos PDFs -->
     <div id="pdf-container" style="display:none; padding: 40px; background: white;"></div>
     <a href="https://wa.me/554896712560" class="btn-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
 
@@ -144,11 +194,34 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        const listaLocais = ["Termas do Gravatal", "Jaguaruna Central", "São Martinho", "Humaitá de Cima", "Humaitá Centro", "Indaial", "Copa 70", "Mato Alto", "Madre", "Várzea das Canoas", "Km 63", "Sertão dos Medeiros", "Bom Pastor", "Guarda Margem Esq.", "Fábio Silva", "Caruru", "São Cristóvão", "Capivari de Baixo", "Treze de Maio", "Braço do Norte", "Comasa"];
+        // Lista de localidades atualizada com as novas inserções
+        const listaLocais = [
+            "Termas do Gravatal", "Jaguaruna Central", "São Martinho", "Humaitá de Cima", 
+            "Humaitá Centro", "Indaial", "Copa 70", "Mato Alto", "Madre", "Várzea das Canoas", 
+            "Km 63", "Sertão dos Medeiros", "Bom Pastor", "Guarda Margem Esq.", "Fábio Silva", 
+            "Caruru", "São Cristóvão", "Capivari de Baixo", "Treze de Maio", "Braço do Norte", 
+            "Comasa", "São Martinho Praia Redonda", "Armazém", "Andrino", "São Ludjero", 
+            "Orleans", "Guatá", "São Sebastião"
+        ];
+        
         const listaInsumos = ["Desinfetante", "Perfumado", "Multiuso ox", "Água Sanitária", "Sabonete líquido", "Papel toalha (rolo)", "Papel toalha (interfolha)", "Papel higiênico (rolão)", "Papel higiênico (rolinho)", "Caixa de água copinho", "Caixa de copo descart.", "Álcool", "Saco de lixo (20 L)", "Saco de lixo (50 L)", "Saco de lixo (60 L)", "Saco de lixo (100 L)", "Saco de lixo (150 L)"];
         
         let bancoDadosMensal = {}; 
         let localAtivo = "";
+
+        // Funções auxiliares para sanitizar as chaves para o Firebase
+        function codificarChave(chave) {
+            return btoa(unescape(encodeURIComponent(chave))).replace(/=/g, "");
+        }
+
+        function decodificarChave(chaveCodificada) {
+            // Helper para mapear os dados codificados de volta para o nome original
+            const mapeamento = {};
+            listaInsumos.forEach(insumo => {
+                mapeamento[codificarChave(insumo)] = insumo;
+            });
+            return mapeamento[chaveCodificada] || chaveCodificada;
+        }
 
         function fazerLogin() {
             const u = document.getElementById('user').value;
@@ -164,7 +237,16 @@
         function sincronizarComFirebase() {
             const mesAtivo = document.getElementById('input-mes-ref').value;
             database.ref('abastecimento/' + mesAtivo).on('value', (snapshot) => {
-                bancoDadosMensal[mesAtivo] = snapshot.val() || {};
+                const dadosRaw = snapshot.val() || {};
+                // Processa e decodifica as chaves vindo do Firebase para manter compatibilidade com o resto do código script
+                bancoDadosMensal[mesAtivo] = {};
+                for (let local in dadosRaw) {
+                    bancoDadosMensal[mesAtivo][local] = {};
+                    for (let chaveCodificada in dadosRaw[local]) {
+                        const chaveOriginal = decodificarChave(chaveCodificada);
+                        bancoDadosMensal[mesAtivo][local][chaveOriginal] = dadosRaw[local][chaveCodificada];
+                    }
+                }
                 renderizarGrid();
                 if(!document.getElementById('view-dash').classList.contains('hidden')) atualizarGraficos();
             });
@@ -175,14 +257,19 @@
             const grid = document.getElementById('grid-unidades');
             const selectEntrega = document.getElementById('select-entrega-local');
             grid.innerHTML = "";
-            selectEntrega.innerHTML = "<option value=''>Escolha uma unidade...</option>";
+            
+            // Adicionado a opção TODOS no topo do select
+            selectEntrega.innerHTML = `
+                <option value=''>Escolha uma unidade...</option>
+                <option value='TODOS'>-- GERAR TODOS AS LOCALIDADES --</option>
+            `;
 
             listaLocais.sort().forEach(nome => {
-                const temDados = bancoDadosMensal[mesAtivo]?.[nome];
+                const temDados = bancoDadosMensal[mesAtivo]?.[nome] && Object.keys(bancoDadosMensal[mesAtivo][nome]).length > 0;
                 grid.innerHTML += `
                     <div class="card-local" onclick="abrirFormulario('${nome}')">
-                        <img src="https://i.postimg.cc/8cG6K4H8/image-removebg-preview-(4).png" class="icon-img">
-                        <strong style="display:block; font-size:16px;">${nome}</strong>
+                        <img src="https://i.postimg.cc/8cG6K4H8/image-removebg-preview-(4).png" class="icon-img" alt="Igreja">
+                        <strong style="display:block; font-size:15px;">${nome}</strong>
                         <div class="status-badge" style="${temDados ? '' : 'display:none'}"><i class="fas fa-check-circle"></i></div>
                     </div>`;
                 selectEntrega.innerHTML += `<option value="${nome}">${nome}</option>`;
@@ -191,11 +278,15 @@
             const formList = document.getElementById('lista-insumos-inputs');
             if(formList.innerHTML === "") {
                 listaInsumos.forEach(item => {
+                    // ID sem caracteres especiais para evitar quebra no seletor HTML DOM
+                    const idSeguro = codificarChave(item);
                     formList.innerHTML += `
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 3fr; gap: 20px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; align-items: center;">
-                            <span style="font-weight: 700;">${item}</span>
-                            <input type="number" class="input-box" style="margin:0; text-align:center" id="qtd-${item}" placeholder="0">
-                            <input type="text" class="input-box" style="margin:0;" id="obs-${item}" placeholder="Obs...">
+                        <div class="insumo-row">
+                            <span class="insumo-title">${item}</span>
+                            <div class="insumo-inputs">
+                                <input type="number" class="input-box" style="margin:0; text-align:center" id="qtd-${idSeguro}" placeholder="0">
+                                <input type="text" class="input-box" style="margin:0;" id="obs-${idSeguro}" placeholder="Obs...">
+                            </div>
                         </div>`;
                 });
             }
@@ -207,8 +298,9 @@
             document.getElementById('title-local-form').innerText = `${nome} (${mesAtivo})`;
             const dadosLocal = bancoDadosMensal[mesAtivo]?.[nome] || {};
             listaInsumos.forEach(item => {
-                document.getElementById('qtd-'+item).value = dadosLocal[item]?.q || "";
-                document.getElementById('obs-'+item).value = dadosLocal[item]?.o || "";
+                const idSeguro = codificarChave(item);
+                document.getElementById('qtd-'+idSeguro).value = dadosLocal[item]?.q || "";
+                document.getElementById('obs-'+idSeguro).value = dadosLocal[item]?.o || "";
             });
             mudarTab('form');
         }
@@ -217,9 +309,13 @@
             const mesAtivo = document.getElementById('input-mes-ref').value;
             let dadosParaSalvar = {};
             listaInsumos.forEach(item => {
-                const q = parseInt(document.getElementById('qtd-'+item).value) || 0;
-                const o = document.getElementById('obs-'+item).value;
-                if(q > 0) dadosParaSalvar[item] = {q, o};
+                const idSeguro = codificarChave(item);
+                const q = parseInt(document.getElementById('qtd-'+idSeguro).value) || 0;
+                const o = document.getElementById('obs-'+idSeguro).value;
+                if(q > 0) {
+                    // Envia com a chave codificada segura para o Firebase
+                    dadosParaSalvar[idSeguro] = {q, o};
+                }
             });
             database.ref(`abastecimento/${mesAtivo}/${localAtivo}`).set(dadosParaSalvar).then(() => mudarTab('home'));
         }
@@ -243,8 +339,8 @@
 
             for(let l in dadosMes) {
                 for(let i in dadosMes[l]) {
-                    totaisInsumos[i] += (dadosMes[l][i].q || 0);
-                    volumePorLocal[l] += (dadosMes[l][i].q || 0);
+                    if(totaisInsumos[i] !== undefined) totaisInsumos[i] += (dadosMes[l][i].q || 0);
+                    if(volumePorLocal[l] !== undefined) volumePorLocal[l] += (dadosMes[l][i].q || 0);
                 }
             }
 
@@ -256,10 +352,10 @@
             window.ch1 = new Chart(document.getElementById('chartPrincipal'), {
                 type: 'bar', 
                 data: { labels: activeInsumos, datasets: [{ data: activeInsumos.map(i => totaisInsumos[i]), backgroundColor: '#0f172a', borderRadius: 8 }] },
-                options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+                options: { indexAxis: 'y', plugins: { legend: { display: false } }, responsive: true }
             });
 
-            // 2. Rosca (Por Material)
+            // 2. Rosca
             if(window.ch2) window.ch2.destroy();
             window.ch2 = new Chart(document.getElementById('chartDonut'), {
                 type: 'doughnut',
@@ -267,10 +363,10 @@
                     labels: activeInsumos, 
                     datasets: [{ data: activeInsumos.map(i => totaisInsumos[i]), backgroundColor: cores, borderWidth: 2 }] 
                 },
-                options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+                options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }, responsive: true }
             });
 
-            // 3. Linha (Por Unidade)
+            // 3. Linha
             if(window.ch3) window.ch3.destroy();
             const labelsLocais = listaLocais.filter(l => volumePorLocal[l] > 0);
             window.ch3 = new Chart(document.getElementById('chartTimeline'), {
@@ -278,7 +374,8 @@
                 data: { 
                     labels: labelsLocais, 
                     datasets: [{ label: 'Volume Total', data: labelsLocais.map(l => volumePorLocal[l]), borderColor: '#0f172a', backgroundColor: 'rgba(15, 23, 42, 0.1)', fill: true, tension: 0.4 }] 
-                }
+                },
+                options: { responsive: true }
             });
         }
 
@@ -317,54 +414,104 @@
             html2pdf().from(container).set({ margin: 10, filename: `Geral_${mesAtivo}.pdf`, image: { type: 'jpeg', quality: 0.98 } }).save().then(() => container.style.display='none');
         }
 
+        // Função do Relatório de Entrega Modificada para suportar "TODOS"
         function gerarPDFEntrega() {
-            const local = document.getElementById('select-entrega-local').value;
+            const localSemicol = document.getElementById('select-entrega-local').value;
             const mes = document.getElementById('input-mes-ref').value;
-            if(!local) return;
-            const dados = bancoDadosMensal[mes]?.[local] || {};
-            let html = `
-                <div style="font-family: sans-serif; border: 2px solid #0f172a; padding: 30px; border-radius: 10px;">
-                    <div style="text-align:center; border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 30px;">
-                        <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" width="80">
-                        <h1 style="margin:15px 0 5px 0; font-size:22px;">CONGREGAÇÃO CRISTÃ NO BRASIL</h1>
-                        <h2 style="margin:0; font-size:18px; color: #475569;">RELATÓRIO DE ENTREGA DE INSUMOS</h2>
-                    </div>
-                    
-                    <div style="margin-bottom: 30px; display: flex; justify-content: space-between;">
-                        <span><strong>UNIDADE:</strong> ${local.toUpperCase()}</span>
-                        <span><strong>MÊS:</strong> ${mes}</span>
-                    </div>
-
-                    <table border="1" style="width:100%; border-collapse:collapse; margin-bottom: 40px;">
-                        <tr style="background:#0f172a; color:white;">
-                            <th style="padding:12px; text-align:left;">DESCRIÇÃO DO ITEM</th>
-                            <th style="padding:12px; width:100px;">QUANT.</th>
-                            <th style="padding:12px; text-align:left;">OBSERVAÇÃO</th>
-                        </tr>`;
-            
-            let count = 0;
-            listaInsumos.forEach(item => { 
-                if(dados[item]) { 
-                    html += `<tr>
-                        <td style="padding:12px;">${item}</td>
-                        <td style="padding:12px;" align="center"><strong>${dados[item].q}</strong></td>
-                        <td style="padding:12px; font-size:11px;">${dados[item].o}</td>
-                    </tr>`; 
-                    count++; 
-                } 
-            });
-
-            html += `</table>
-                    <div style="margin-top:80px; display:flex; justify-content: space-around; text-align:center;">
-                        <div style="width:250px; border-top: 1px solid #000; padding-top:10px;">Assinatura Responsável</div>
-                        <div style="width:250px; border-top: 1px solid #000; padding-top:10px;">Data da Entrega</div>
-                    </div>
-                </div>`;
+            if(!localSemicol) {
+                alert("Por favor, selecione uma localidade ou a opção TODOS.");
+                return;
+            }
 
             const container = document.getElementById('pdf-container');
-            container.innerHTML = count > 0 ? html : "<h3 style='text-align:center'>Nenhum dado registrado para esta unidade.</h3>";
-            container.style.display = 'block';
-            html2pdf().from(container).set({ margin: 15, filename: `Entrega_${local}_${mes}.pdf` }).save().then(() => container.style.display='none');
+            container.innerHTML = ""; // Limpa estrutura anterior
+
+            // Helper para montar a estrutura HTML do recibo de uma unidade específica
+            function montarHtmlLocal(nomeLocal, dadosLocal) {
+                let htmlTemplate = `
+                    <div style="font-family: sans-serif; border: 2px solid #0f172a; padding: 30px; border-radius: 10px; background: white; margin-bottom: 30px; page-break-after: always;">
+                        <div style="text-align:center; border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 30px;">
+                            <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" width="80">
+                            <h1 style="margin:15px 0 5px 0; font-size:22px;">CONGREGAÇÃO CRISTÃ NO BRASIL</h1>
+                            <h2 style="margin:0; font-size:18px; color: #475569;">RELATÓRIO DE ENTREGA DE INSUMOS</h2>
+                        </div>
+                        
+                        <div style="margin-bottom: 30px; display: flex; justify-content: space-between;">
+                            <span><strong>UNIDADE:</strong> ${nomeLocal.toUpperCase()}</span>
+                            <span><strong>MÊS:</strong> ${mes}</span>
+                        </div>
+
+                        <table border="1" style="width:100%; border-collapse:collapse; margin-bottom: 40px;">
+                            <tr style="background:#0f172a; color:white;">
+                                <th style="padding:12px; text-align:left;">DESCRIÇÃO DO ITEM</th>
+                                <th style="padding:12px; width:100px;">QUANT.</th>
+                                <th style="padding:12px; text-align:left;">OBSERVAÇÃO</th>
+                            </tr>`;
+
+                let itensInclusos = 0;
+                listaInsumos.forEach(item => { 
+                    if(dadosLocal[item]) { 
+                        htmlTemplate += `<tr>
+                            <td style="padding:12px;">${item}</td>
+                            <td style="padding:12px;" align="center"><strong>${dadosLocal[item].q}</strong></td>
+                            <td style="padding:12px; font-size:11px;">${dadosLocal[item].o}</td>
+                        </tr>`; 
+                        itensInclusos++; 
+                    } 
+                });
+
+                htmlTemplate += `</table>
+                        <div style="margin-top:80px; display:flex; justify-content: space-around; text-align:center;">
+                            <div style="width:250px; border-top: 1px solid #000; padding-top:10px;">Assinatura Responsável</div>
+                            <div style="width:250px; border-top: 1px solid #000; padding-top:10px;">Data da Entrega</div>
+                        </div>
+                    </div>`;
+
+                return itensInclusos > 0 ? htmlTemplate : "";
+            }
+
+            let htmlFinal = "";
+
+            if (localSemicol === "TODOS") {
+                // Filtra e agrupa todas as localidades que contêm dados preenchidos no mês ativo
+                const dadosMes = bancoDadosMensal[mes] || {};
+                const locaisOrdenados = Object.keys(dadosMes).sort();
+
+                locaisOrdenados.forEach(nomeUnidade => {
+                    const dadosUnidade = dadosMes[nomeUnidade];
+                    if (dadosUnidade) {
+                        htmlFinal += montarHtmlLocal(nomeUnidade, dadosUnidade);
+                    }
+                });
+
+                if(htmlFinal === "") {
+                    container.innerHTML = "<h3 style='text-align:center'>Nenhum dado registrado em nenhuma unidade para este mês.</h3>";
+                    container.style.display = 'block';
+                    return;
+                }
+                
+                container.innerHTML = htmlFinal;
+                container.style.display = 'block';
+                
+                html2pdf().from(container).set({ 
+                    margin: 15, 
+                    filename: `Entregas_Todas_Unidades_${mes}.pdf`,
+                    pagebreak: { mode: 'css' }
+                }).save().then(() => container.style.display='none');
+
+            } else {
+                // Comportamento normal para uma única unidade selecionada
+                const dados = bancoDadosMensal[mes]?.[localSemicol] || {};
+                htmlFinal = montarHtmlLocal(localSemicol, dados);
+                
+                container.innerHTML = htmlFinal !== "" ? htmlFinal : "<h3 style='text-align:center'>Nenhum dado registrado para esta unidade.</h3>";
+                container.style.display = 'block';
+                
+                html2pdf().from(container).set({ 
+                    margin: 15, 
+                    filename: `Entrega_${localSemicol}_${mes}.pdf` 
+                }).save().then(() => container.style.display='none');
+            }
         }
     </script>
 </body>
