@@ -65,6 +65,9 @@
         /* Layout de Gráficos Adaptável */
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
         
+        /* Container Oculto do PDF - Posicionado fora da tela para evitar falhas no html2pdf */
+        #pdf-container { position: absolute; left: -9999px; top: -9999px; width: 800px; padding: 40px; background: white; }
+        
         /* Botão Whatsapp */
         .btn-whatsapp { position: fixed; bottom: 20px; right: 20px; background: #25d366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3); text-decoration: none; font-size: 1.6rem; z-index: 999; }
 
@@ -86,7 +89,6 @@
             .btn-whatsapp { bottom: 40px; right: 40px; width: 65px; height: 65px; font-size: 2rem; }
         }
         
-        /* CSS utilitário para alinhar topo do formulário */
         .form-header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
         @media (min-width: 500px) {
             .form-header { flex-direction: row; justify-content: space-between; align-items: center; }
@@ -177,8 +179,8 @@
         </div>
     </div>
 
-    <!-- Container temporário oculto para renderização dos PDFs -->
-    <div id="pdf-container" style="display:none; padding: 40px; background: white;"></div>
+    <!-- Container do PDF fora do fluxo para evitar quebras visuais e de impressão -->
+    <div id="pdf-container"></div>
     <a href="https://wa.me/554896712560" class="btn-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
 
     <script>
@@ -194,11 +196,10 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Lista de localidades atualizada com as novas inserções
         const listaLocais = [
             "Termas do Gravatal", "Jaguaruna Central", "São Martinho", "Humaitá de Cima", 
             "Humaitá Centro", "Indaial", "Copa 70", "Mato Alto", "Madre", "Várzea das Canoas", 
-            "Km 63", "Sertão dos Medeiros", "Bom Pastor", "Guarda Margem Esq.", "Fábio Silva", 
+            "Km 63", "Sertão dos Medeiros", "Bom Pastor", "Guarda Margem Esq", "Fábio Silva", 
             "Caruru", "São Cristóvão", "Capivari de Baixo", "Treze de Maio", "Braço do Norte", 
             "Comasa", "São Martinho Praia Redonda", "Armazém", "Andrino", "São Ludjero", 
             "Orleans", "Guatá", "São Sebastião"
@@ -208,14 +209,16 @@
         
         let bancoDadosMensal = {}; 
         let localAtivo = "";
+        let refAnterior = null; // Evita vazamento de conexões
 
-        // Funções auxiliares para sanitizar as chaves para o Firebase
         function codificarChave(chave) {
-            return btoa(unescape(encodeURIComponent(chave))).replace(/=/g, "");
+            return btoa(unescape(encodeURIComponent(chave)))
+                .replace(/=/g, "")
+                .replace(/\//g, "_")
+                .replace(/\+/g, "-");
         }
 
         function decodificarChave(chaveCodificada) {
-            // Helper para mapear os dados codificados de volta para o nome original
             const mapeamento = {};
             listaInsumos.forEach(insumo => {
                 mapeamento[codificarChave(insumo)] = insumo;
@@ -226,7 +229,7 @@
         function fazerLogin() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
-            if(u === 'admin' && p === 'admin') {
+            if(u === 'admin' && p === 'admin') { // Restaurado com sucesso!
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('app').classList.remove('hidden');
                 document.getElementById('input-mes-ref').value = new Date().toISOString().slice(0, 7);
@@ -236,9 +239,12 @@
 
         function sincronizarComFirebase() {
             const mesAtivo = document.getElementById('input-mes-ref').value;
-            database.ref('abastecimento/' + mesAtivo).on('value', (snapshot) => {
+            
+            if (refAnterior) { refAnterior.off(); }
+            refAnterior = database.ref('abastecimento/' + mesAtivo);
+            
+            refAnterior.on('value', (snapshot) => {
                 const dadosRaw = snapshot.val() || {};
-                // Processa e decodifica as chaves vindo do Firebase para manter compatibilidade com o resto do código script
                 bancoDadosMensal[mesAtivo] = {};
                 for (let local in dadosRaw) {
                     bancoDadosMensal[mesAtivo][local] = {};
@@ -258,7 +264,6 @@
             const selectEntrega = document.getElementById('select-entrega-local');
             grid.innerHTML = "";
             
-            // Adicionado a opção TODOS no topo do select
             selectEntrega.innerHTML = `
                 <option value=''>Escolha uma unidade...</option>
                 <option value='TODOS'>-- GERAR TODOS AS LOCALIDADES --</option>
@@ -278,7 +283,6 @@
             const formList = document.getElementById('lista-insumos-inputs');
             if(formList.innerHTML === "") {
                 listaInsumos.forEach(item => {
-                    // ID sem caracteres especiais para evitar quebra no seletor HTML DOM
                     const idSeguro = codificarChave(item);
                     formList.innerHTML += `
                         <div class="insumo-row">
@@ -313,11 +317,16 @@
                 const q = parseInt(document.getElementById('qtd-'+idSeguro).value) || 0;
                 const o = document.getElementById('obs-'+idSeguro).value;
                 if(q > 0) {
-                    // Envia com a chave codificada segura para o Firebase
                     dadosParaSalvar[idSeguro] = {q, o};
                 }
             });
-            database.ref(`abastecimento/${mesAtivo}/${localAtivo}`).set(dadosParaSalvar).then(() => mudarTab('home'));
+            
+            database.ref(`abastecimento/${mesAtivo}/${localAtivo}`).set(dadosParaSalvar)
+                .then(() => mudarTab('home'))
+                .catch((error) => {
+                    console.error("Erro ao salvar:", error);
+                    alert("Não foi possível salvar os registros. Verifique sua conexão com a internet.");
+                });
         }
 
         function mudarTab(nome) {
@@ -347,7 +356,6 @@
             const activeInsumos = listaInsumos.filter(i => totaisInsumos[i] > 0);
             const cores = ['#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'];
 
-            // 1. Barras
             if(window.ch1) window.ch1.destroy();
             window.ch1 = new Chart(document.getElementById('chartPrincipal'), {
                 type: 'bar', 
@@ -355,7 +363,6 @@
                 options: { indexAxis: 'y', plugins: { legend: { display: false } }, responsive: true }
             });
 
-            // 2. Rosca
             if(window.ch2) window.ch2.destroy();
             window.ch2 = new Chart(document.getElementById('chartDonut'), {
                 type: 'doughnut',
@@ -366,7 +373,6 @@
                 options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }, responsive: true }
             });
 
-            // 3. Linha
             if(window.ch3) window.ch3.destroy();
             const labelsLocais = listaLocais.filter(l => volumePorLocal[l] > 0);
             window.ch3 = new Chart(document.getElementById('chartTimeline'), {
@@ -409,12 +415,12 @@
                 }
                 if(has) html += `<div style="background:#0f172a; color:white; padding:5px 12px; font-weight:bold; margin-top:20px;">${item.toUpperCase()} (TOTAL: ${itemTotal})</div>` + table + `</table>`;
             });
+            
             const container = document.getElementById('pdf-container');
-            container.innerHTML = html; container.style.display = 'block';
-            html2pdf().from(container).set({ margin: 10, filename: `Geral_${mesAtivo}.pdf`, image: { type: 'jpeg', quality: 0.98 } }).save().then(() => container.style.display='none');
+            container.innerHTML = html; 
+            html2pdf().from(container).set({ margin: 10, filename: `Geral_${mesAtivo}.pdf`, image: { type: 'jpeg', quality: 0.98 } }).save().then(() => { container.innerHTML = ""; });
         }
 
-        // Função do Relatório de Entrega Modificada para suportar "TODOS"
         function gerarPDFEntrega() {
             const localSemicol = document.getElementById('select-entrega-local').value;
             const mes = document.getElementById('input-mes-ref').value;
@@ -424,9 +430,8 @@
             }
 
             const container = document.getElementById('pdf-container');
-            container.innerHTML = ""; // Limpa estrutura anterior
+            container.innerHTML = ""; 
 
-            // Helper para montar a estrutura HTML do recibo de uma unidade específica
             function montarHtmlLocal(nomeLocal, dadosLocal) {
                 let htmlTemplate = `
                     <div style="font-family: sans-serif; border: 2px solid #0f172a; padding: 30px; border-radius: 10px; background: white; margin-bottom: 30px; page-break-after: always;">
@@ -473,7 +478,6 @@
             let htmlFinal = "";
 
             if (localSemicol === "TODOS") {
-                // Filtra e agrupa todas as localidades que contêm dados preenchidos no mês ativo
                 const dadosMes = bancoDadosMensal[mes] || {};
                 const locaisOrdenados = Object.keys(dadosMes).sort();
 
@@ -485,32 +489,33 @@
                 });
 
                 if(htmlFinal === "") {
-                    container.innerHTML = "<h3 style='text-align:center'>Nenhum dado registrado em nenhuma unidade para este mês.</h3>";
-                    container.style.display = 'block';
+                    alert("Nenhum dado registrado em nenhuma unidade para este mês.");
                     return;
                 }
                 
                 container.innerHTML = htmlFinal;
-                container.style.display = 'block';
                 
                 html2pdf().from(container).set({ 
                     margin: 15, 
                     filename: `Entregas_Todas_Unidades_${mes}.pdf`,
                     pagebreak: { mode: 'css' }
-                }).save().then(() => container.style.display='none');
+                }).save().then(() => { container.innerHTML = ""; });
 
             } else {
-                // Comportamento normal para uma única unidade selecionada
                 const dados = bancoDadosMensal[mes]?.[localSemicol] || {};
                 htmlFinal = montarHtmlLocal(localSemicol, dados);
                 
-                container.innerHTML = htmlFinal !== "" ? htmlFinal : "<h3 style='text-align:center'>Nenhum dado registrado para esta unidade.</h3>";
-                container.style.display = 'block';
+                if(htmlFinal === "") {
+                    alert("Nenhum dado registrado para esta unidade.");
+                    return;
+                }
+                
+                container.innerHTML = htmlFinal;
                 
                 html2pdf().from(container).set({ 
                     margin: 15, 
                     filename: `Entrega_${localSemicol}_${mes}.pdf` 
-                }).save().then(() => container.style.display='none');
+                }).save().then(() => { container.innerHTML = ""; });
             }
         }
     </script>
