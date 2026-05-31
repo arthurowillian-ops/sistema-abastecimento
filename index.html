@@ -65,8 +65,8 @@
         /* Layout de Gráficos Adaptável */
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
         
-        /* Container Oculto do PDF - Posicionado fora da tela para evitar falhas no html2pdf */
-        #pdf-container { position: absolute; left: -9999px; top: -9999px; width: 800px; padding: 40px; background: white; }
+        /* CORREÇÃO: Restaurado para display:none padrão. O JS vai controlar a ativação visual correta na hora do print */
+        #pdf-container { display: none; padding: 40px; background: white; font-family: sans-serif; }
         
         /* Botão Whatsapp */
         .btn-whatsapp { position: fixed; bottom: 20px; right: 20px; background: #25d366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3); text-decoration: none; font-size: 1.6rem; z-index: 999; }
@@ -179,7 +179,7 @@
         </div>
     </div>
 
-    <!-- Container do PDF fora do fluxo para evitar quebras visuais e de impressão -->
+    <!-- Container do PDF -->
     <div id="pdf-container"></div>
     <a href="https://wa.me/554896712560" class="btn-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
 
@@ -209,7 +209,7 @@
         
         let bancoDadosMensal = {}; 
         let localAtivo = "";
-        let refAnterior = null; // Evita vazamento de conexões
+        let refAnterior = null; 
 
         function codificarChave(chave) {
             return btoa(unescape(encodeURIComponent(chave)))
@@ -229,7 +229,7 @@
         function fazerLogin() {
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
-            if(u === 'admin' && p === 'admin') { // Restaurado com sucesso!
+            if(u === 'admin' && p === 'admin') { 
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('app').classList.remove('hidden');
                 document.getElementById('input-mes-ref').value = new Date().toISOString().slice(0, 7);
@@ -385,10 +385,11 @@
             });
         }
 
+        // CORREÇÃO: Funções de PDF reestruturadas para exibição em bloco antes da captura
         function gerarPDF() {
             const mesAtivo = document.getElementById('input-mes-ref').value;
             const dadosMes = bancoDadosMensal[mesAtivo] || {};
-            let html = `<div style="text-align:center; font-family: sans-serif;">
+            let html = `<div style="text-align:center; padding: 20px;">
                 <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" width="70">
                 <h2 style="margin:10px 0 0 0;">CONGREGAÇÃO CRISTÃ NO BRASIL</h2>
                 <h3 style="margin:5px 0 20px 0; color:#475569;">Relatório Geral de Insumos - ${mesAtivo}</h3>
@@ -418,7 +419,16 @@
             
             const container = document.getElementById('pdf-container');
             container.innerHTML = html; 
-            html2pdf().from(container).set({ margin: 10, filename: `Geral_${mesAtivo}.pdf`, image: { type: 'jpeg', quality: 0.98 } }).save().then(() => { container.innerHTML = ""; });
+            container.style.display = 'block'; // Torna visível para o renderizador calcular as dimensões
+
+            html2pdf().from(container).set({ 
+                margin: 10, 
+                filename: `Geral_${mesAtivo}.pdf`, 
+                image: { type: 'jpeg', quality: 0.98 } 
+            }).save().then(() => { 
+                container.style.display = 'none'; // Esconde novamente
+                container.innerHTML = ""; 
+            });
         }
 
         function gerarPDFEntrega() {
@@ -434,7 +444,7 @@
 
             function montarHtmlLocal(nomeLocal, dadosLocal) {
                 let htmlTemplate = `
-                    <div style="font-family: sans-serif; border: 2px solid #0f172a; padding: 30px; border-radius: 10px; background: white; margin-bottom: 30px; page-break-after: always;">
+                    <div style="border: 2px solid #0f172a; padding: 30px; border-radius: 10px; background: white; margin-bottom: 30px; page-break-after: always;">
                         <div style="text-align:center; border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 30px;">
                             <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" width="80">
                             <h1 style="margin:15px 0 5px 0; font-size:22px;">CONGREGAÇÃO CRISTÃ NO BRASIL</h1>
@@ -494,12 +504,16 @@
                 }
                 
                 container.innerHTML = htmlFinal;
+                container.style.display = 'block';
                 
                 html2pdf().from(container).set({ 
                     margin: 15, 
                     filename: `Entregas_Todas_Unidades_${mes}.pdf`,
                     pagebreak: { mode: 'css' }
-                }).save().then(() => { container.innerHTML = ""; });
+                }).save().then(() => { 
+                    container.style.display = 'none';
+                    container.innerHTML = ""; 
+                });
 
             } else {
                 const dados = bancoDadosMensal[mes]?.[localSemicol] || {};
@@ -511,11 +525,15 @@
                 }
                 
                 container.innerHTML = htmlFinal;
+                container.style.display = 'block';
                 
                 html2pdf().from(container).set({ 
                     margin: 15, 
                     filename: `Entrega_${localSemicol}_${mes}.pdf` 
-                }).save().then(() => { container.innerHTML = ""; });
+                }).save().then(() => { 
+                    container.style.display = 'none';
+                    container.innerHTML = ""; 
+                });
             }
         }
     </script>
