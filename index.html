@@ -29,13 +29,15 @@
         body { background-color: var(--bg-body); color: var(--primary); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
         .hidden { display: none !important; }
         
-        /* Login */
-        #login-page { min-height: 100vh; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at top right, #cbd5e1, #f1f5f9); padding: 20px; }
-        .login-card { background: var(--surface); padding: 40px 30px; border-radius: 32px; box-shadow: var(--shadow-bold); width: 100%; max-width: 380px; text-align: center; }
-        .login-card img { width: 100px; margin-bottom: 10px; }
         .input-box { width: 100%; padding: 14px; margin: 8px 0; border: 1.5px solid var(--border); border-radius: 14px; box-sizing: border-box; outline: none; font-family: inherit; font-size: 15px; }
         .btn-action { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 15px; }
         .btn-action:hover { opacity: 0.9; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: flex; justify-content: center; align-items: center; padding: 20px; z-index: 1000; }
+        .modal-card { background: var(--surface); padding: 30px; border-radius: 24px; width: 100%; max-width: 420px; box-shadow: var(--shadow-bold); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .modal-erro { color: #dc2626; font-size: 13px; font-weight: 600; min-height: 18px; margin: 4px 0 0 0; }
         
         /* Header Responsivo */
         header { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); border-bottom: 1px solid var(--border); padding: 15px 30px; display: flex; flex-direction: column; gap: 15px; position: sticky; top: 0; z-index: 100; }
@@ -58,9 +60,6 @@
         .dash-card, .form-card { background: var(--surface); padding: 25px; border-radius: 24px; border: 1px solid var(--border); margin-bottom: 25px; }
         
         /* Linha de insumo no formulário adaptável */
-        .insumo-row { display: grid; grid-template-columns: 1fr; gap: 10px; padding: 15px 0; border-bottom: 1px solid #f1f5f9; align-items: center; }
-        .insumo-title { font-weight: 700; font-size: 15px; }
-        .insumo-inputs { display: grid; grid-template-columns: 80px 1fr; gap: 10px; }
         
         /* Layout de Gráficos Adaptável */
         .charts-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
@@ -82,14 +81,48 @@
             .grid-locais { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 30px; }
             .card-local { padding: 45px 25px; }
             .card-local .icon-img { width: 110px; height: 110px; }
-            .insumo-row { grid-template-columns: 2fr 1fr 3fr; gap: 20px; padding: 12px 0; }
-            .insumo-inputs { display: contents; }
             .charts-grid { grid-template-columns: 1.5fr 1fr; }
             .chart-span-2 { grid-column: span 2; }
             .btn-whatsapp { bottom: 40px; right: 40px; width: 65px; height: 65px; font-size: 2rem; }
         }
         
         .form-header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+        .form-wrap { max-width: 820px; margin: 0 auto; }
+        .form-titulo { font-weight: 800; margin: 0; font-size: 26px; }
+        .form-sub { color: var(--secondary); font-size: 14px; font-weight: 600; text-transform: capitalize; margin-top: 2px; }
+        .form-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+        .btn-ghost { background: var(--surface); border: 1.5px solid var(--border); color: var(--secondary); padding: 8px 14px; border-radius: 12px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; margin-left: 6px; }
+        .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+        .insumo-lista { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; overflow: hidden; }
+        .insumo-item { border-bottom: 1px solid #f1f5f9; border-left: 4px solid transparent; transition: background .2s, border-color .2s; }
+        .insumo-item:last-child { border-bottom: none; }
+        .insumo-item.ativo { background: #f0fdf4; border-left-color: #10b981; }
+        .insumo-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
+        .insumo-nome { flex: 1; min-width: 0; font-weight: 700; font-size: 15px; }
+        .tag-fora { background: #f1f5f9; color: #64748b; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 99px; margin-left: 6px; vertical-align: middle; text-transform: uppercase; }
+        .stepper { display: flex; align-items: center; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; }
+        .stepper button { width: 40px; height: 42px; border: none; background: none; font-size: 20px; font-weight: 800; color: var(--secondary); cursor: pointer; }
+        .stepper button:active { background: #e2e8f0; }
+        .stepper input { width: 54px; height: 42px; text-align: center; border: none; background: transparent; font-weight: 800; font-size: 16px; font-family: inherit; outline: none; -moz-appearance: textfield; }
+        .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .btn-obs { width: 42px; height: 42px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface); color: #94a3b8; cursor: pointer; }
+        .btn-obs.tem { color: var(--primary); border-color: var(--primary); }
+        .obs-linha { padding: 0 16px 12px 16px; }
+        .obs-linha .input-box { margin: 0; padding: 10px 14px; font-size: 14px; }
+        .barra-salvar { position: sticky; bottom: 0; margin-top: 16px; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 20px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; box-shadow: 0 -4px 20px rgba(0,0,0,.06); }
+        .resumo-form { font-weight: 800; font-size: 14px; }
+        body.em-form .btn-whatsapp { display: none; }
+        .modal-grande { max-width: 560px; max-height: 85vh; display: flex; flex-direction: column; }
+        #ger-lista { overflow-y: auto; }
+        .ger-item { display: flex; align-items: center; gap: 8px; padding: 10px 4px; border-bottom: 1px solid #f1f5f9; }
+        .ger-item .input-box { margin: 0; padding: 10px 12px; flex: 1; min-width: 0; }
+        .ger-nome { flex: 1; font-weight: 600; min-width: 0; }
+        .ger-perigo { background: #fef2f2; border-radius: 12px; padding: 10px 12px; }
+        .btn-mini { border: 1.5px solid var(--border); background: var(--surface); border-radius: 10px; padding: 8px 12px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .btn-mini.ok { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .btn-mini.perigo { background: #dc2626; color: #fff; border-color: #dc2626; }
+        .btn-icon { width: 36px; height: 36px; border-radius: 10px; border: none; background: #f8fafc; color: var(--secondary); cursor: pointer; }
+        .btn-icon.perigo:hover { background: #fee2e2; color: #dc2626; }
         @media (min-width: 500px) {
             .form-header { flex-direction: row; justify-content: space-between; align-items: center; }
         }
@@ -97,18 +130,7 @@
 </head>
 <body>
 
-    <div id="login-page">
-        <div class="login-card">
-            <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" alt="Logo">
-            <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #0f172a;">ABASTECIMENTO</h1>
-            <p style="margin: 5px 0 30px 0; font-size: 12px; color: #64748b; letter-spacing: 2px; font-weight: 600;">SISTEMA DE INSUMOS</p>
-            <input type="text" id="user" class="input-box" placeholder="Usuário">
-            <input type="password" id="pass" class="input-box" placeholder="Senha">
-            <button class="btn-action" onclick="fazerLogin()">ENTRAR</button>
-        </div>
-    </div>
-
-    <div id="app" class="hidden">
+    <div id="app">
         <header>
             <div class="brand-box">
                 <img src="https://i.postimg.cc/L6QH7GbZ/Logo-oficial-CCB.png" alt="Logo">
@@ -121,7 +143,6 @@
                 <button onclick="mudarTab('home')" id="nav-home" class="active">LOCALIDADES</button>
                 <button onclick="mudarTab('dash')" id="nav-dash">DASHBOARD</button>
                 <button onclick="mudarTab('entrega')" id="nav-entrega">RELATÓRIOS</button>
-                <button onclick="location.reload()" style="color: #ef4444; background: #fee2e2;"><i class="fas fa-power-off"></i> SAIR</button>
             </nav>
         </header>
 
@@ -131,17 +152,34 @@
                     <h2 style="font-weight: 800; font-size: 26px; margin: 0;">Rede de Distribuição</h2>
                     <input type="month" id="input-mes-ref" class="input-box" style="width: 100%; max-width: 200px; margin: 0;" onchange="sincronizarComFirebase()">
                 </div>
+                <button class="btn-action" style="width:auto; padding:12px 22px; margin-bottom:25px;" onclick="abrirModalCasa()">
+                    <i class="fas fa-plus"></i> NOVA CASA DE ORAÇÃO
+                </button>
+                <button class="btn-action" style="width:auto; padding:12px 22px; margin-bottom:25px; margin-left:8px; background:#475569;" onclick="abrirGerenciador('casa')"><i class="fas fa-pen"></i> EDITAR LISTA</button>
                 <div class="grid-locais" id="grid-unidades"></div>
             </div>
 
             <div id="view-form" class="hidden">
-                <div class="form-header">
-                    <h2 id="title-local-form" style="font-weight: 800; margin: 0; font-size: 22px;"></h2>
-                    <button onclick="mudarTab('home')" class="btn-action" style="width: auto; padding: 10px 20px; background: #64748b;">VOLTAR</button>
-                </div>
-                <div class="form-card">
-                    <div id="lista-insumos-inputs"></div>
-                    <button class="btn-action" style="margin-top: 30px;" onclick="salvarDadosUnidade()">SALVAR REGISTROS</button>
+                <div class="form-wrap">
+                    <div class="form-header">
+                        <div>
+                            <h2 id="title-local-form" class="form-titulo"></h2>
+                            <div id="sub-mes-form" class="form-sub"></div>
+                        </div>
+                        <button onclick="mudarTab('home')" class="btn-action" style="width: auto; padding: 10px 20px; background: #64748b;">VOLTAR</button>
+                    </div>
+                    <div class="form-toolbar">
+                        <strong style="font-size:13px; color:var(--secondary); letter-spacing:1px;">INSUMOS</strong>
+                        <div>
+                            <button class="btn-ghost" onclick="abrirModalInsumo()"><i class="fas fa-plus"></i> Novo insumo</button>
+                            <button class="btn-ghost" onclick="abrirGerenciador('insumo')"><i class="fas fa-pen"></i> Editar lista</button>
+                        </div>
+                    </div>
+                    <div class="insumo-lista" id="lista-insumos-inputs"></div>
+                    <div class="barra-salvar">
+                        <span id="resumo-form" class="resumo-form">0 itens · 0 unidades</span>
+                        <button class="btn-action" style="width:auto; padding:14px 32px;" onclick="salvarDadosUnidade()">SALVAR REGISTROS</button>
+                    </div>
                 </div>
             </div>
 
@@ -176,6 +214,44 @@
                     <button class="btn-action" style="margin-top: 20px;" onclick="gerarPDFEntrega()">GERAR RELATÓRIO</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div id="modal-casa" class="modal-overlay hidden" onclick="if(event.target===this) fecharModalCasa()">
+        <div class="modal-card">
+            <h3 style="margin:0 0 5px 0; font-weight:800;">Nova Casa de Oração</h3>
+            <p style="margin:0 0 15px 0; font-size:13px; color:var(--secondary);">Ela passa a aparecer na lista de localidades, nos gráficos e nos relatórios.</p>
+            <input type="text" id="input-nova-casa" class="input-box" placeholder="Nome da localidade" maxlength="60" onkeydown="if(event.key==='Enter') salvarNovaCasa()">
+            <p id="modal-casa-erro" class="modal-erro"></p>
+            <div class="modal-actions">
+                <button class="btn-action" style="background:#64748b;" onclick="fecharModalCasa()">CANCELAR</button>
+                <button class="btn-action" onclick="salvarNovaCasa()">CADASTRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-insumo" class="modal-overlay hidden" onclick="if(event.target===this) fecharModalInsumo()">
+        <div class="modal-card">
+            <h3 style="margin:0 0 5px 0; font-weight:800;">Novo Insumo</h3>
+            <p style="margin:0 0 15px 0; font-size:13px; color:var(--secondary);">Passa a aparecer no formulário de todas as localidades, nos gráficos e nos relatórios. O que você já digitou no formulário aberto é mantido.</p>
+            <input type="text" id="input-novo-insumo" class="input-box" placeholder="Nome do insumo (ex: Esponja)" maxlength="60" onkeydown="if(event.key==='Enter') salvarNovoInsumo()">
+            <p id="modal-insumo-erro" class="modal-erro"></p>
+            <div class="modal-actions">
+                <button class="btn-action" style="background:#64748b;" onclick="fecharModalInsumo()">CANCELAR</button>
+                <button class="btn-action" onclick="salvarNovoInsumo()">CADASTRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-gerenciar" class="modal-overlay hidden" onclick="if(event.target===this) fecharGerenciador()">
+        <div class="modal-card modal-grande">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <h3 id="ger-titulo" style="margin:0; font-weight:800;"></h3>
+                <button class="btn-mini" onclick="fecharGerenciador()">Fechar</button>
+            </div>
+            <p style="margin:0 0 10px 0; font-size:12px; color:var(--secondary);">Renomear atualiza também os registros de todos os meses. Excluir só tira o item da lista: os registros antigos continuam salvos e aparecem nos meses em que tiveram dados.</p>
+            <p id="ger-erro" class="modal-erro"></p>
+            <div id="ger-lista"></div>
         </div>
     </div>
 
@@ -218,29 +294,369 @@
                 .replace(/\+/g, "-");
         }
 
-        function decodificarChave(chaveCodificada) {
-            const mapeamento = {};
-            listaInsumos.forEach(insumo => {
-                mapeamento[codificarChave(insumo)] = insumo;
-            });
-            return mapeamento[chaveCodificada] || chaveCodificada;
+
+        // ---- Casas de oração cadastradas pelo sistema (além da lista fixa) ----
+
+        function normalizar(t) {
+            return t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/\s+/g, ' ');
         }
 
-        function fazerLogin() {
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
-            if(u === 'admin' && p === 'admin') { 
-                document.getElementById('login-page').classList.add('hidden');
-                document.getElementById('app').classList.remove('hidden');
-                document.getElementById('input-mes-ref').value = new Date().toISOString().slice(0, 7);
-                sincronizarComFirebase();
-            } else { alert("Acesso negado."); }
+        function esc(t) {
+            return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+
+
+        function abrirModalCasa() {
+            document.getElementById('input-nova-casa').value = '';
+            document.getElementById('modal-casa-erro').innerText = '';
+            document.getElementById('modal-casa').classList.remove('hidden');
+            setTimeout(() => document.getElementById('input-nova-casa').focus(), 50);
+        }
+
+        function fecharModalCasa() {
+            document.getElementById('modal-casa').classList.add('hidden');
+        }
+
+        function salvarNovaCasa() {
+            const nome = document.getElementById('input-nova-casa').value.trim().replace(/\s+/g, ' ');
+            const erro = document.getElementById('modal-casa-erro');
+            if (nome.length < 2) { erro.innerText = 'Digite o nome da localidade.'; return; }
+            // O nome vira chave no Firebase (abastecimento/mês/nome), que não aceita estes caracteres
+            if (/[.$#\[\]\/\\]/.test(nome)) { erro.innerText = 'Não use os caracteres . $ # [ ] / \\ no nome.'; return; }
+            const jaExiste = todosLocais().some(n => normalizar(n) === normalizar(nome));
+            if (jaExiste) { erro.innerText = 'Essa localidade já está cadastrada.'; return; }
+            database.ref('locais').push({ nome: nome, criadoEm: firebase.database.ServerValue.TIMESTAMP, ordem: Date.now() })
+                .then(() => fecharModalCasa())
+                .catch((e) => {
+                    console.error('Erro ao cadastrar casa:', e);
+                    erro.innerText = 'Não foi possível cadastrar. Verifique sua conexão.';
+                });
+        }
+
+        // ---- Insumos cadastrados pelo sistema (além da lista fixa) ----
+
+
+
+
+        function abrirModalInsumo() {
+            document.getElementById('input-novo-insumo').value = '';
+            document.getElementById('modal-insumo-erro').innerText = '';
+            document.getElementById('modal-insumo').classList.remove('hidden');
+            setTimeout(() => document.getElementById('input-novo-insumo').focus(), 50);
+        }
+
+        function fecharModalInsumo() {
+            document.getElementById('modal-insumo').classList.add('hidden');
+        }
+
+        function salvarNovoInsumo() {
+            const nome = document.getElementById('input-novo-insumo').value.trim().replace(/\s+/g, ' ');
+            const erro = document.getElementById('modal-insumo-erro');
+            if (nome.length < 2) { erro.innerText = 'Digite o nome do insumo.'; return; }
+            if (todosInsumos().some(n => normalizar(n) === normalizar(nome))) {
+                erro.innerText = 'Esse insumo já está cadastrado.';
+                return;
+            }
+            database.ref('insumos').push({ nome: nome, criadoEm: firebase.database.ServerValue.TIMESTAMP, ordem: Date.now() })
+                .then(() => fecharModalInsumo())
+                .catch((e) => {
+                    console.error('Erro ao cadastrar insumo:', e);
+                    erro.innerText = 'Não foi possível cadastrar. Verifique sua conexão.';
+                });
+        }
+
+
+        // ---- Listas de casas e insumos (ficam no Firebase; as listas fixas só servem de semente) ----
+        let locaisReg = [], insumosReg = [];
+        let locaisCarregados = false, insumosCarregados = false, mesCarregado = false;
+        let gerTipo = null, gerEditId = null, gerExcluirId = null;
+
+        function decodificarChave(c) {
+            try {
+                let b = c.replace(/-/g, '+').replace(/_/g, '/');
+                while (b.length % 4) b += '=';
+                return decodeURIComponent(escape(atob(b)));
+            } catch (e) { return c; }
+        }
+
+        function todosLocais() { return locaisReg.map(l => l.nome); }
+        function todosInsumos() { return insumosReg.map(i => i.nome); }
+        function mesAtual() { return document.getElementById('input-mes-ref').value; }
+        function ativo(lista, nome) { return lista.some(n => normalizar(n) === normalizar(nome)); }
+
+        // Casas/insumos excluídos continuam aparecendo nos meses em que têm registros (histórico preservado)
+        function unirComHistorico(nomes, extras) {
+            const lista = nomes.slice();
+            extras.forEach(n => { if (!ativo(lista, n)) lista.push(n); });
+            return lista;
+        }
+        function locaisDoMes() {
+            const dados = bancoDadosMensal[mesAtual()] || {};
+            return unirComHistorico(todosLocais(), Object.keys(dados)).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+        }
+        function insumosDoMes() {
+            const dados = bancoDadosMensal[mesAtual()] || {};
+            const extras = [];
+            Object.keys(dados).forEach(l => Object.keys(dados[l]).forEach(i => extras.push(i)));
+            return unirComHistorico(todosInsumos(), extras);
+        }
+
+        function lerLista(snapshot) {
+            const itens = [];
+            snapshot.forEach(f => {
+                const v = f.val();
+                if (v && typeof v.nome === 'string' && v.nome.trim()) itens.push({ id: f.key, nome: v.nome.trim(), ordem: v.ordem || 0 });
+            });
+            return itens;
+        }
+
+        // Na primeira execução, grava as listas fixas no Firebase para que também possam ser editadas/excluídas.
+        // As chaves são determinísticas, então rodar duas vezes ao mesmo tempo não duplica nada.
+        function semearListasBase() {
+            return Promise.all([
+                database.ref('config/listasBase').once('value'),
+                database.ref('locais').once('value'),
+                database.ref('insumos').once('value')
+            ]).then(([flag, locs, ins]) => {
+                if (flag.val()) return;
+                const upd = { 'config/listasBase': true };
+                const agora = Date.now();
+                const semear = (no, base, existentes) => {
+                    const ja = lerLista(existentes).map(i => i.nome);
+                    base.forEach((nome, i) => {
+                        if (!ativo(ja, nome)) upd[`${no}/${codificarChave(nome)}`] = { nome: nome, ordem: i, criadoEm: agora };
+                    });
+                };
+                semear('locais', listaLocais, locs);
+                semear('insumos', listaInsumos, ins);
+                return database.ref().update(upd);
+            });
+        }
+
+        function escutarLocaisCadastrados() {
+            database.ref('locais').on('value', (snap) => {
+                locaisReg = lerLista(snap);
+                locaisCarregados = true;
+                renderizarGrid();
+                if(!document.getElementById('view-dash').classList.contains('hidden')) atualizarGraficos();
+                if (gerTipo === 'casa') renderizarGerenciador(true);
+            });
+        }
+
+        function escutarInsumosCadastrados() {
+            database.ref('insumos').on('value', (snap) => {
+                insumosReg = lerLista(snap).sort((a, b) => a.ordem - b.ordem || a.nome.localeCompare(b.nome, 'pt-BR'));
+                insumosCarregados = insumosReg.length > 0;
+                montarFormInsumos();
+                if(!document.getElementById('view-dash').classList.contains('hidden')) atualizarGraficos();
+                if (gerTipo === 'insumo') renderizarGerenciador(true);
+            }, (erro) => console.error('Erro ao ler insumos:', erro));
+        }
+
+        function iniciarApp() {
+            document.getElementById('input-mes-ref').value = new Date().toISOString().slice(0, 7);
+            sincronizarComFirebase();
+            semearListasBase()
+                .catch(e => console.error('Erro ao preparar listas:', e))
+                .then(() => { escutarInsumosCadastrados(); escutarLocaisCadastrados(); });
+        }
+
+        // ---- Formulário da localidade ----
+        function montarFormInsumos() {
+            const formList = document.getElementById('lista-insumos-inputs');
+            const digitado = {};
+            formList.querySelectorAll('input[id]').forEach(el => { digitado[el.id] = el.value; });
+            const reg = todosInsumos();
+            formList.innerHTML = insumosDoMes().map(item => {
+                const id = codificarChave(item);
+                const fora = ativo(reg, item) ? '' : '<span class="tag-fora">removido</span>';
+                return `
+                    <div class="insumo-item" data-id="${id}">
+                        <div class="insumo-row">
+                            <span class="insumo-nome">${esc(item)}${fora}</span>
+                            <button type="button" class="btn-obs" id="btnobs-${id}" title="Observação" onclick="alternarObs('${id}')"><i class="far fa-comment-dots"></i></button>
+                            <div class="stepper">
+                                <button type="button" onclick="ajustarQtd('${id}', -1)">&minus;</button>
+                                <input type="number" min="0" inputmode="numeric" class="qtd-input" id="qtd-${id}" placeholder="0" oninput="atualizarResumo()" onkeydown="enterProximo(event)">
+                                <button type="button" onclick="ajustarQtd('${id}', 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="obs-linha hidden" id="obslinha-${id}"><input type="text" class="input-box" id="obs-${id}" placeholder="Observação (opcional)" oninput="atualizarResumo()"></div>
+                    </div>`;
+            }).join('');
+            Object.keys(digitado).forEach(id => { const el = document.getElementById(id); if (el) el.value = digitado[id]; });
+            atualizarResumo();
+        }
+
+        function atualizarResumo() {
+            let itens = 0, total = 0;
+            document.querySelectorAll('#lista-insumos-inputs .insumo-item').forEach(row => {
+                const id = row.dataset.id;
+                const q = parseInt(document.getElementById('qtd-' + id).value) || 0;
+                const obs = document.getElementById('obs-' + id).value.trim();
+                row.classList.toggle('ativo', q > 0);
+                document.getElementById('btnobs-' + id).classList.toggle('tem', !!obs);
+                if (obs) document.getElementById('obslinha-' + id).classList.remove('hidden');
+                if (q > 0) { itens++; total += q; }
+            });
+            const el = document.getElementById('resumo-form');
+            if (el) el.innerText = `${itens} ${itens === 1 ? 'item' : 'itens'} · ${total} ${total === 1 ? 'unidade' : 'unidades'}`;
+        }
+
+        function ajustarQtd(id, delta) {
+            const el = document.getElementById('qtd-' + id);
+            const v = Math.max(0, (parseInt(el.value) || 0) + delta);
+            el.value = v > 0 ? v : '';
+            atualizarResumo();
+        }
+
+        function alternarObs(id) {
+            const linha = document.getElementById('obslinha-' + id);
+            linha.classList.toggle('hidden');
+            if (!linha.classList.contains('hidden')) document.getElementById('obs-' + id).focus();
+        }
+
+        function enterProximo(e) {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            const todos = [...document.querySelectorAll('.qtd-input')];
+            const prox = todos[todos.indexOf(e.target) + 1];
+            if (prox) { prox.focus(); prox.select(); }
+        }
+
+        function abrirFormulario(nome) {
+            if (!insumosCarregados || !mesCarregado) { alert("Carregando os dados. Tente novamente em alguns segundos."); return; }
+            localAtivo = nome;
+            const mes = mesAtual();
+            montarFormInsumos();
+            const dadosLocal = bancoDadosMensal[mes]?.[nome] || {};
+            document.getElementById('title-local-form').innerText = nome;
+            const [ano, m] = mes.split('-');
+            document.getElementById('sub-mes-form').innerText = new Date(ano, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            document.querySelectorAll('#lista-insumos-inputs .insumo-item').forEach(row => {
+                const id = row.dataset.id;
+                const d = dadosLocal[decodificarChave(id)];
+                document.getElementById('qtd-' + id).value = d?.q || '';
+                const obs = document.getElementById('obs-' + id);
+                obs.value = d?.o || '';
+                document.getElementById('obslinha-' + id).classList.toggle('hidden', !obs.value);
+            });
+            atualizarResumo();
+            mudarTab('form');
+            window.scrollTo(0, 0);
+        }
+
+        function salvarDadosUnidade() {
+            // Sem a lista e o mês carregados, salvar apagaria registros que já existem
+            if (!insumosCarregados || !mesCarregado) { alert("Dados ainda carregando. Tente novamente."); return; }
+            const mesAtivo = mesAtual();
+            const dadosParaSalvar = {};
+            document.querySelectorAll('#lista-insumos-inputs .insumo-item').forEach(row => {
+                const id = row.dataset.id;
+                const q = parseInt(document.getElementById('qtd-' + id).value) || 0;
+                if (q > 0) dadosParaSalvar[id] = { q, o: document.getElementById('obs-' + id).value };
+            });
+            database.ref(`abastecimento/${mesAtivo}/${localAtivo}`).set(dadosParaSalvar)
+                .then(() => mudarTab('home'))
+                .catch((error) => {
+                    console.error("Erro ao salvar:", error);
+                    alert("Não foi possível salvar os registros. Verifique sua conexão com a internet.");
+                });
+        }
+
+        // ---- Editar / excluir casas e insumos ----
+        function abrirGerenciador(tipo) {
+            gerTipo = tipo; gerEditId = null; gerExcluirId = null;
+            document.getElementById('ger-titulo').innerText = tipo === 'casa' ? 'Casas de oração' : 'Insumos';
+            setGerErro('');
+            document.getElementById('modal-gerenciar').classList.remove('hidden');
+            renderizarGerenciador();
+        }
+        function fecharGerenciador() { gerTipo = null; document.getElementById('modal-gerenciar').classList.add('hidden'); }
+        function setGerErro(t) { document.getElementById('ger-erro').innerText = t; }
+        function cancelarGer() { gerEditId = null; gerExcluirId = null; setGerErro(''); renderizarGerenciador(); }
+        function iniciarRenomear(id) {
+            gerEditId = id; gerExcluirId = null; setGerErro(''); renderizarGerenciador();
+            const i = document.getElementById('ger-input');
+            if (i) { i.focus(); i.select(); }
+        }
+        function iniciarExcluir(id) { gerExcluirId = id; gerEditId = null; setGerErro(''); renderizarGerenciador(); }
+
+        function renderizarGerenciador(manter) {
+            if (!gerTipo) return;
+            const atual = document.getElementById('ger-input');
+            const valor = manter && atual ? atual.value : null;
+            const itens = gerTipo === 'casa' ? locaisReg.slice().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')) : insumosReg;
+            document.getElementById('ger-lista').innerHTML = itens.map(it => {
+                if (it.id === gerEditId) return `<div class="ger-item">
+                    <input class="input-box" id="ger-input" value="${esc(it.nome)}" maxlength="60" onkeydown="if(event.key==='Enter') confirmarRenomear('${it.id}'); if(event.key==='Escape') cancelarGer();">
+                    <button class="btn-mini ok" onclick="confirmarRenomear('${it.id}')">Salvar</button>
+                    <button class="btn-mini" onclick="cancelarGer()">Cancelar</button></div>`;
+                if (it.id === gerExcluirId) return `<div class="ger-item ger-perigo">
+                    <span class="ger-nome">Excluir "${esc(it.nome)}"?</span>
+                    <button class="btn-mini perigo" onclick="confirmarExcluir('${it.id}')">Excluir</button>
+                    <button class="btn-mini" onclick="cancelarGer()">Cancelar</button></div>`;
+                return `<div class="ger-item"><span class="ger-nome">${esc(it.nome)}</span>
+                    <button class="btn-icon" title="Renomear" onclick="iniciarRenomear('${it.id}')"><i class="fas fa-pen"></i></button>
+                    <button class="btn-icon perigo" title="Excluir" onclick="iniciarExcluir('${it.id}')"><i class="fas fa-trash"></i></button></div>`;
+            }).join('') || '<p style="color:var(--secondary)">Nenhum item cadastrado.</p>';
+            const novo = document.getElementById('ger-input');
+            if (novo && valor !== null) novo.value = valor;
+        }
+
+        function confirmarExcluir(id) {
+            const no = gerTipo === 'casa' ? 'locais' : 'insumos';
+            database.ref(`${no}/${id}`).remove()
+                .then(() => cancelarGer())
+                .catch(e => { console.error(e); setGerErro('Não foi possível excluir. Verifique a conexão.'); });
+        }
+
+        function confirmarRenomear(id) {
+            const lista = gerTipo === 'casa' ? locaisReg : insumosReg;
+            const item = lista.find(i => i.id === id);
+            if (!item) return;
+            const novo = document.getElementById('ger-input').value.trim().replace(/\s+/g, ' ');
+            if (novo === item.nome) return cancelarGer();
+            if (novo.length < 2) return setGerErro('Digite um nome.');
+            if (gerTipo === 'casa' && /[.$#\[\]\/\\]/.test(novo)) return setGerErro('Não use os caracteres . $ # [ ] / \\ no nome.');
+            if (lista.some(i => i.id !== id && normalizar(i.nome) === normalizar(novo))) return setGerErro('Já existe um item com esse nome.');
+            setGerErro('Salvando...');
+            const tipo = gerTipo;
+            const encA = codificarChave(item.nome), encN = codificarChave(novo);
+            database.ref('abastecimento').once('value').then(snap => {
+                const arvore = snap.val() || {};
+                const upd = {};
+                const conflito = (mes) => { throw new Error(`O nome "${novo}" coincide com registros antigos de ${mes}. Use outro nome.`); };
+                // Move os registros de todos os meses para o novo nome, tudo numa gravação só (ou grava tudo ou nada)
+                Object.keys(arvore).forEach(mes => {
+                    const locais = arvore[mes] || {};
+                    if (tipo === 'casa') {
+                        if (locais[item.nome] === undefined) return;
+                        if (locais[novo] !== undefined) conflito(mes);
+                        upd[`abastecimento/${mes}/${novo}`] = locais[item.nome];
+                        upd[`abastecimento/${mes}/${item.nome}`] = null;
+                    } else {
+                        Object.keys(locais).forEach(loc => {
+                            const reg = locais[loc] || {};
+                            if (reg[encA] === undefined) return;
+                            if (reg[encN] !== undefined) conflito(mes);
+                            upd[`abastecimento/${mes}/${loc}/${encN}`] = reg[encA];
+                            upd[`abastecimento/${mes}/${loc}/${encA}`] = null;
+                        });
+                    }
+                });
+                upd[`${tipo === 'casa' ? 'locais' : 'insumos'}/${id}/nome`] = novo;
+                return database.ref().update(upd);
+            }).then(() => cancelarGer())
+              .catch(e => { console.error(e); setGerErro(e.message || 'Não foi possível renomear.'); });
         }
 
         function sincronizarComFirebase() {
             const mesAtivo = document.getElementById('input-mes-ref').value;
             
             if (refAnterior) { refAnterior.off(); }
+            mesCarregado = false;
             refAnterior = database.ref('abastecimento/' + mesAtivo);
             
             refAnterior.on('value', (snapshot) => {
@@ -253,7 +669,9 @@
                         bancoDadosMensal[mesAtivo][local][chaveOriginal] = dadosRaw[local][chaveCodificada];
                     }
                 }
+                mesCarregado = true;
                 renderizarGrid();
+                montarFormInsumos();
                 if(!document.getElementById('view-dash').classList.contains('hidden')) atualizarGraficos();
             });
         }
@@ -262,6 +680,7 @@
             const mesAtivo = document.getElementById('input-mes-ref').value;
             const grid = document.getElementById('grid-unidades');
             const selectEntrega = document.getElementById('select-entrega-local');
+            const escolhaAnterior = selectEntrega.value;
             grid.innerHTML = "";
             
             selectEntrega.innerHTML = `
@@ -269,67 +688,25 @@
                 <option value='TODOS'>-- GERAR TODOS AS LOCALIDADES --</option>
             `;
 
-            listaLocais.sort().forEach(nome => {
+            locaisDoMes().forEach(nome => {
                 const temDados = bancoDadosMensal[mesAtivo]?.[nome] && Object.keys(bancoDadosMensal[mesAtivo][nome]).length > 0;
                 grid.innerHTML += `
-                    <div class="card-local" onclick="abrirFormulario('${nome}')">
+                    <div class="card-local" data-nome="${esc(nome)}" onclick="abrirFormulario(this.dataset.nome)">
                         <img src="https://i.postimg.cc/8cG6K4H8/image-removebg-preview-(4).png" class="icon-img" alt="Igreja">
-                        <strong style="display:block; font-size:15px;">${nome}</strong>
+                        <strong style="display:block; font-size:15px;">${esc(nome)}</strong>
+                        ${locaisCarregados && !ativo(todosLocais(), nome) ? '<span class="tag-fora" style="margin:6px 0 0 0; display:inline-block;">removida</span>' : ''}
                         <div class="status-badge" style="${temDados ? '' : 'display:none'}"><i class="fas fa-check-circle"></i></div>
                     </div>`;
-                selectEntrega.innerHTML += `<option value="${nome}">${nome}</option>`;
+                selectEntrega.innerHTML += `<option value="${esc(nome)}">${esc(nome)}</option>`;
             });
 
-            const formList = document.getElementById('lista-insumos-inputs');
-            if(formList.innerHTML === "") {
-                listaInsumos.forEach(item => {
-                    const idSeguro = codificarChave(item);
-                    formList.innerHTML += `
-                        <div class="insumo-row">
-                            <span class="insumo-title">${item}</span>
-                            <div class="insumo-inputs">
-                                <input type="number" class="input-box" style="margin:0; text-align:center" id="qtd-${idSeguro}" placeholder="0">
-                                <input type="text" class="input-box" style="margin:0;" id="obs-${idSeguro}" placeholder="Obs...">
-                            </div>
-                        </div>`;
-                });
-            }
+            selectEntrega.value = escolhaAnterior;
         }
 
-        function abrirFormulario(nome) {
-            localAtivo = nome;
-            const mesAtivo = document.getElementById('input-mes-ref').value;
-            document.getElementById('title-local-form').innerText = `${nome} (${mesAtivo})`;
-            const dadosLocal = bancoDadosMensal[mesAtivo]?.[nome] || {};
-            listaInsumos.forEach(item => {
-                const idSeguro = codificarChave(item);
-                document.getElementById('qtd-'+idSeguro).value = dadosLocal[item]?.q || "";
-                document.getElementById('obs-'+idSeguro).value = dadosLocal[item]?.o || "";
-            });
-            mudarTab('form');
-        }
 
-        function salvarDadosUnidade() {
-            const mesAtivo = document.getElementById('input-mes-ref').value;
-            let dadosParaSalvar = {};
-            listaInsumos.forEach(item => {
-                const idSeguro = codificarChave(item);
-                const q = parseInt(document.getElementById('qtd-'+idSeguro).value) || 0;
-                const o = document.getElementById('obs-'+idSeguro).value;
-                if(q > 0) {
-                    dadosParaSalvar[idSeguro] = {q, o};
-                }
-            });
-            
-            database.ref(`abastecimento/${mesAtivo}/${localAtivo}`).set(dadosParaSalvar)
-                .then(() => mudarTab('home'))
-                .catch((error) => {
-                    console.error("Erro ao salvar:", error);
-                    alert("Não foi possível salvar os registros. Verifique sua conexão com a internet.");
-                });
-        }
 
         function mudarTab(nome) {
+            document.body.classList.toggle('em-form', nome === 'form');
             ['home', 'form', 'dash', 'entrega'].forEach(v => {
                 document.getElementById('view-'+v).classList.toggle('hidden', v !== nome);
                 if(document.getElementById('nav-'+v)) document.getElementById('nav-'+v).classList.toggle('active', v === nome);
@@ -343,8 +720,8 @@
             
             const totaisInsumos = {}; 
             const volumePorLocal = {};
-            listaInsumos.forEach(i => totaisInsumos[i] = 0);
-            listaLocais.forEach(l => volumePorLocal[l] = 0);
+            insumosDoMes().forEach(i => totaisInsumos[i] = 0);
+            locaisDoMes().forEach(l => volumePorLocal[l] = 0);
 
             for(let l in dadosMes) {
                 for(let i in dadosMes[l]) {
@@ -353,7 +730,7 @@
                 }
             }
 
-            const activeInsumos = listaInsumos.filter(i => totaisInsumos[i] > 0);
+            const activeInsumos = insumosDoMes().filter(i => totaisInsumos[i] > 0);
             const cores = ['#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'];
 
             if(window.ch1) window.ch1.destroy();
@@ -374,7 +751,7 @@
             });
 
             if(window.ch3) window.ch3.destroy();
-            const labelsLocais = listaLocais.filter(l => volumePorLocal[l] > 0);
+            const labelsLocais = locaisDoMes().filter(l => volumePorLocal[l] > 0);
             window.ch3 = new Chart(document.getElementById('chartTimeline'), {
                 type: 'line',
                 data: { 
@@ -395,7 +772,7 @@
                 <h3 style="margin:5px 0 20px 0; color:#475569;">Relatório Geral de Insumos - ${mesAtivo}</h3>
             </div>`;
             
-            listaInsumos.forEach(item => {
+            insumosDoMes().forEach(item => {
                 let itemTotal = 0; 
                 let table = `<table border="1" style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:12px;">
                     <tr style="background:#f8fafc;">
@@ -407,14 +784,14 @@
                 for(let loc in dadosMes) { 
                     if(dadosMes[loc][item]) { 
                         table += `<tr>
-                            <td style="padding:8px;">${loc}</td>
+                            <td style="padding:8px;">${esc(loc)}</td>
                             <td style="padding:8px;" align="center">${dadosMes[loc][item].q}</td>
-                            <td style="padding:8px;">${dadosMes[loc][item].o}</td>
+                            <td style="padding:8px;">${esc(dadosMes[loc][item].o || '')}</td>
                         </tr>`; 
                         itemTotal += dadosMes[loc][item].q; has = true; 
                     } 
                 }
-                if(has) html += `<div style="background:#0f172a; color:white; padding:5px 12px; font-weight:bold; margin-top:20px;">${item.toUpperCase()} (TOTAL: ${itemTotal})</div>` + table + `</table>`;
+                if(has) html += `<div style="background:#0f172a; color:white; padding:5px 12px; font-weight:bold; margin-top:20px;">${esc(item.toUpperCase())} (TOTAL: ${itemTotal})</div>` + table + `</table>`;
             });
             
             const container = document.getElementById('pdf-container');
@@ -452,7 +829,7 @@
                         </div>
                         
                         <div style="margin-bottom: 30px; display: flex; justify-content: space-between;">
-                            <span><strong>UNIDADE:</strong> ${nomeLocal.toUpperCase()}</span>
+                            <span><strong>UNIDADE:</strong> ${esc(nomeLocal.toUpperCase())}</span>
                             <span><strong>MÊS:</strong> ${mes}</span>
                         </div>
 
@@ -464,12 +841,12 @@
                             </tr>`;
 
                 let itensInclusos = 0;
-                listaInsumos.forEach(item => { 
+                insumosDoMes().forEach(item => { 
                     if(dadosLocal[item]) { 
                         htmlTemplate += `<tr>
-                            <td style="padding:12px;">${item}</td>
+                            <td style="padding:12px;">${esc(item)}</td>
                             <td style="padding:12px;" align="center"><strong>${dadosLocal[item].q}</strong></td>
-                            <td style="padding:12px; font-size:11px;">${dadosLocal[item].o}</td>
+                            <td style="padding:12px; font-size:11px;">${esc(dadosLocal[item].o || '')}</td>
                         </tr>`; 
                         itensInclusos++; 
                     } 
@@ -536,6 +913,8 @@
                 });
             }
         }
+
+        iniciarApp();
     </script>
 </body>
 </html>
